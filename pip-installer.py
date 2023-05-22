@@ -75,27 +75,55 @@ def view_extensions():
     except subprocess.CalledProcessError:
         print("Error retrieving extension information.")
 
-
 def update_packages():
     try:
         # Update pip
         subprocess.run(['pip', 'install', '--upgrade', 'pip'], check=True)
 
         # Update other packages
-        subprocess.run('pip list --outdated  | grep -v \'^-e\' | cut -d \'=\' -f 1 | xargs -n1 pip install -U',
-                       shell=True, check=True)
+        outdated_packages = subprocess.run(
+            'pip list --outdated --format=legacy | grep -v \'^-e\' | cut -d \'=\' -f 1',
+            shell=True, check=True, capture_output=True, text=True
+        )
 
-        print("Packages updated successfully.")
+        packages = outdated_packages.stdout.strip().split('\n')
+
+        num_updated_packages = 0
+        for package in packages:
+            if package.strip() != '':
+                try:
+                    subprocess.run(['pip', 'install', '-U', package], check=True)
+                    num_updated_packages += 1
+                except subprocess.CalledProcessError as e:
+                    error_message = e.stderr
+                    if error_message is not None:
+                        error_message = error_message.decode().strip()
+                        if not error_message.startswith("ERROR: Invalid requirement:"):
+                            print(f"Error updating package '{package}': {error_message}")
+                        else:
+                            print(f"Skipped updating package '{package}' due to an error")
+                    else:
+                        print(f"Error updating package '{package}'")
+
+        if num_updated_packages == 0:
+            print("All packages are up to date.")
+        else:
+            print(f"{num_updated_packages} packages updated successfully.")
     except subprocess.CalledProcessError:
         print("Error updating packages.")
         sys.exit(PACKAGE_UPDATE_ERROR)
+
+
+
+
+
 
 
 def display_stats(start_time, errors, num_updated_installed):
     end_time = time.time()
     elapsed_time = end_time - start_time
 
-    print("---------- Statistics ----------")
+    print("\n---------- Statistics ----------")
     print(f"Time elapsed: {elapsed_time:.2f} seconds")
     print(f"Errors encountered: {errors}")
     print(f"Number of updated/installed packages: {num_updated_installed}")
@@ -126,7 +154,7 @@ def main():
                 print("pip is not installed. Installing pip...")
                 install_pip()
 
-            print("===================================")
+            print("\n===================================")
             print("           Package Installer       ")
             print("===================================")
             print("1. Single Mode")
