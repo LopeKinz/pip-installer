@@ -53,10 +53,10 @@ def update_packages():
     try:
         # Update pip
         subprocess.run(['pip', 'install', '--upgrade', 'pip'], check=True)
-        
+
         # Update other packages
         subprocess.run('pip list --outdated  | grep -v \'^-e\' | cut -d \'=\' -f 1 | xargs -n1 pip install -U', shell=True, check=True)
-        
+
         console_output.insert(tk.END, "Packages updated successfully.\n")
     except subprocess.CalledProcessError:
         console_output.insert(tk.END, "Error updating packages.\n")
@@ -190,5 +190,12 @@ console_frame.pack()
 
 console_output = tkst.ScrolledText(console_frame, width=70, height=20)
 console_output.pack()
+
+def write_to_console_output(text):
+    console_output.insert(tk.END, text)
+
+# Redirect stdout and stderr to the console_output
+sys.stdout.write = write_to_console_output
+sys.stderr.write = write_to_console_output
 
 root.mainloop()
