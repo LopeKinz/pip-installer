@@ -136,3 +136,8 @@ This package installer is developed by LopeKinz.
 
 - GitHub: [https://github.com/LopeKinz](https://github.com/LopeKinz)
 
+## Star History <a name="star-history"></a>
+
+<a href="https://github.com/lopekinz/pip-installer/stargazers">
+        <img width="500" alt="Star History Chart" src="https://api.star-history.com/svg?repos=lopekinz/pip-installer&type=Date">
+      </a> 
