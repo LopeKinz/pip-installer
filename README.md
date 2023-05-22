@@ -37,4 +37,19 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ## Contact
 For any questions or inquiries, feel free to reach out to the project maintainer, [LopeKinz](https://github.com/LopeKinz).
 
+## Changelog
+
+### Version 1.1.0 (2023.05.22)
+
+- Added error handling for subprocess calls
+- Improved user input validation
+- Refactored code into smaller functions for better organization
+- Fixed minor bugs
+
+### Version 1.0.0 (2023.05.22)
+
+- Initial release
+- Added package installation functionality
+- Implemented single and multi-mode installation options
+- Added view extensions and update packages options
 
