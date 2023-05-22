@@ -27,6 +27,7 @@ To get started with the pip-installer, follow these steps:
    ```
 
 4. Follow the on-screen prompts to install the desired Python packages.
+5. Wanna Try GUI Version? Download [HERE](https://github.com/LopeKinz/pip-installer/tree/dev)
 
 ## Contributing
 Contributions to the pip-installer project are welcome! If you encounter any issues or have suggestions for improvements, please submit a pull request or open an issue in the GitHub repository.
