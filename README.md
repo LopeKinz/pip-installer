@@ -40,6 +40,10 @@ For any questions or inquiries, feel free to reach out to the project maintainer
 
 ## Changelog
 
+### Version 1.2.0 (2023.05.22)
+
+- Added Version control
+
 ### Version 1.1.1 (2023.05.22)
 
 - Better Error Handling
