@@ -9,6 +9,7 @@ pip-installer is a command-line tool that allows you to easily install and manag
 - Multi Mode: Install multiple packages at once by providing a comma-separated list of package names.
 - View Extensions: View all installed packages and check for available updates.
 - Update Packages: Update all outdated packages to their latest versions.
+- Displaying Time, Errors and Installed/Updated Packages
 
 ## Installation
 
