@@ -1,137 +1,75 @@
 # pip-installer
 
-## Overview
-The pip-installer repository provides a user-friendly solution for managing Python packages with pip, simplifying the installation process for developers.
+pip-installer is a Python package installation and management tool with a user-friendly GUI. It allows you to install, update, and view information about Python packages using the pip package manager.
 
-## Features
-- Streamlined package installation: Easily install and manage Python packages with a simplified approach.
-- Intuitive interface: The pip-installer offers a user-friendly interface, making it straightforward to set up development environments or deploy applications.
-- Time-saving: By automating the package installation process, pip-installer saves valuable time and effort for developers.
+## Installation
 
-## Getting Started
-To get started with the pip-installer, follow these steps:
+To use pip-installer, you need to have Python installed on your system. The recommended Python version is 3.6 or above.
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/LopeKinz/pip-installer.git
-   ```
+1. Clone the repository or download the source code from the development branch.
+2. Navigate to the project directory.
 
-2. Install pip (if not already installed):
-   ```
-   # Instructions for installing pip can be found at: https://pip.pypa.io/en/stable/installing/
-   ```
+```bash
+$ cd pip-installer
+```
 
-3. Run the pip-installer script:
-   ```
-   python pip-installer.py
-   ```
+3. Install the required dependencies by running the following command:
 
-4. Follow the on-screen prompts to install the desired Python packages.
-
-## Contributing
-Contributions to the pip-installer project are welcome! If you encounter any issues or have suggestions for improvements, please submit a pull request or open an issue in the GitHub repository.
-
-## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
-
-## Contact
-For any questions or inquiries, feel free to reach out to the project maintainer, [LopeKinz](https://github.com/LopeKinz).
-
-## Changelog
-
-### Version 1.1.0 (2023.05.22)
-
-- Added error handling for subprocess calls
-- Improved user input validation
-- Refactored code into smaller functions for better organization
-- Fixed minor bugs
-
-### Version 1.0.0 (2023.05.22)
-
-- Initial release
-- Added package installation functionality
-- Implemented single and multi-mode installation options
-- Added view extensions and update packages options
-
-# Documentation
-
-## Package Installer
-
-Package Installer is a command-line tool that allows you to install, view, and update Python packages using the `pip` package manager.
+```bash
+$ pip install -r requirements.txt
+```
 
 ## Usage
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/LopeKinz/pip-installer.git
-   ```
+To launch the pip-installer GUI, run the following command:
 
-2. Navigate to the project directory:
-   ```
-   cd pip-installer
-   ```
+```bash
+$ python main.py
+```
 
-3. Install the required packages:
-   ```
-   pip install -r requirements.txt
-   ```
+The GUI window will appear, providing various options for package installation and management:
 
-4. Run the script:
-   ```
-   python installer.py
-   ```
+### Single Mode
 
-## Options
+In Single Mode, you can install a single package by entering the package name in the provided input field and clicking the "Execute" button. The console output will display the installation progress and any errors encountered.
 
-The Package Installer provides the following options:
+### Multi Mode
 
-- **Single Mode (1):** Install a single package.
+In Multi Mode, you can install multiple packages at once. Enter a comma-separated list of package names in the input field and click the "Execute" button. The console output will show the installation progress and errors, if any.
 
-- **Multi Mode (2):** Install multiple packages.
+### View Extensions
 
-- **View Extensions (3):** View outdated packages.
+Choosing the "View Extensions" option will display a list of outdated packages installed in your system. The console output will show the package names and their current versions.
 
-- **Update Packages (4):** Update all packages.
+### Update Packages
 
-- **Exit (0):** Exit the program.
+Selecting the "Update Packages" option will update pip to the latest version and upgrade all outdated packages on your system. The console output will provide information about the updated packages and any errors encountered during the update process.
 
-## Single Mode
+### Exit
 
-In Single Mode, you can install a single package by following these steps:
+Clicking the "Exit" option will close the pip-installer GUI.
 
-1. Enter the package name to install.
+## Development
 
-2. Repeat step 1 to install more packages or enter 'q' to quit.
+The development branch contains the latest features and improvements that are still being tested. Use this branch if you want to contribute or test the latest changes.
 
-## Multi Mode
+## Contributing
 
-In Multi Mode, you can install multiple packages by following these steps:
+Contributions to pip-installer are welcome! If you want to contribute, please follow these steps:
 
-1. Enter package names separated by commas.
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Implement your changes and test them thoroughly.
+4. Commit your changes and push the branch to your forked repository.
+5. Submit a pull request to the development branch of the main repository.
 
-2. Repeat step 1 to install more packages or press 'Enter' to quit.
+Please ensure that your code follows the project's coding conventions and includes appropriate documentation.
 
-## View Extensions
+## License
 
-In View Extensions mode, you can view outdated packages by running the command.
+pip-installer is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
 
-## Update Packages
+## Acknowledgments
 
-In Update Packages mode, you can update all installed packages by running the command.
-
-## Statistics
-
-After each operation, statistics will be displayed, including:
-
-- Time elapsed: The total time taken to complete the operation.
-
-- Errors encountered: The number of errors encountered during the operation.
-
-- Number of updated/installed packages: The total number of packages that were updated or installed.
-
-## Author
-
-This package installer is developed by LopeKinz.
-
-- GitHub: [https://github.com/LopeKinz](https://github.com/LopeKinz)
-
+- This project was inspired by the need for a user-friendly package installer tool.
+- Special thanks to the contributors who have helped improve and expand the functionality of pip-installer.
