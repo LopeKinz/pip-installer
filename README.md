@@ -53,3 +53,85 @@ For any questions or inquiries, feel free to reach out to the project maintainer
 - Implemented single and multi-mode installation options
 - Added view extensions and update packages options
 
+# Documentation
+
+## Package Installer
+
+Package Installer is a command-line tool that allows you to install, view, and update Python packages using the `pip` package manager.
+
+## Usage
+
+1. Clone the repository:
+   ```
+   git clone https://github.com/LopeKinz/pip-installer.git
+   ```
+
+2. Navigate to the project directory:
+   ```
+   cd pip-installer
+   ```
+
+3. Install the required packages:
+   ```
+   pip install -r requirements.txt
+   ```
+
+4. Run the script:
+   ```
+   python installer.py
+   ```
+
+## Options
+
+The Package Installer provides the following options:
+
+- **Single Mode (1):** Install a single package.
+
+- **Multi Mode (2):** Install multiple packages.
+
+- **View Extensions (3):** View outdated packages.
+
+- **Update Packages (4):** Update all packages.
+
+- **Exit (0):** Exit the program.
+
+## Single Mode
+
+In Single Mode, you can install a single package by following these steps:
+
+1. Enter the package name to install.
+
+2. Repeat step 1 to install more packages or enter 'q' to quit.
+
+## Multi Mode
+
+In Multi Mode, you can install multiple packages by following these steps:
+
+1. Enter package names separated by commas.
+
+2. Repeat step 1 to install more packages or press 'Enter' to quit.
+
+## View Extensions
+
+In View Extensions mode, you can view outdated packages by running the command.
+
+## Update Packages
+
+In Update Packages mode, you can update all installed packages by running the command.
+
+## Statistics
+
+After each operation, statistics will be displayed, including:
+
+- Time elapsed: The total time taken to complete the operation.
+
+- Errors encountered: The number of errors encountered during the operation.
+
+- Number of updated/installed packages: The total number of packages that were updated or installed.
+
+## Author
+
+This package installer is developed by LopeKinz.
+
+- GitHub: [https://github.com/LopeKinz](https://github.com/LopeKinz)
+
