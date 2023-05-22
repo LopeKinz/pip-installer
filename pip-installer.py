@@ -1,0 +1,95 @@
+import subprocess
+
+def check_package_availability(package):
+    try:
+        subprocess.check_output(['pip', 'show', package])
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+def install_package(package):
+    try:
+        subprocess.check_call(['pip', 'install', package])
+        print(f"Successfully installed {package}")
+    except subprocess.CalledProcessError:
+        print(f"Error installing {package}")
+
+def install_packages(package_list):
+    packages = package_list.split(',')
+    for package in packages:
+        package = package.strip()
+        if check_package_availability(package):
+            print(f"Package '{package}' already installed")
+        else:
+            install_package(package)
+
+def view_extensions():
+    try:
+        output = subprocess.check_output(['pip', 'list', '--outdated'])
+        print("Extensions:")
+        print("-----------")
+        print(output.decode('utf-8'))
+    except subprocess.CalledProcessError:
+        print("Error retrieving extension information.")
+
+def update_packages():
+    try:
+        subprocess.check_call(['pip', 'list', '--outdated', '--format=freeze', '|', 'grep', '-v', '^-e', '|', 'cut', '-d', '=' '-f 1', '|', 'xargs', '-n1', 'pip', 'install', '-U'])
+        print("Packages updated successfully.")
+    except subprocess.CalledProcessError:
+        print("Error updating packages.")
+
+def main():
+    while True:
+        print("===================================")
+        print("           Package Installer       ")
+        print("===================================")
+        print("1. Single Mode")
+        print("2. Multi Mode")
+        print("3. View Extensions")
+        print("4. Update Packages")
+        print("0. Exit")
+        print("-----------------------------------")
+        print("Author: LopeKinz")
+        print("GitHub: https://github.com/LopeKinz")
+        print("-----------------------------------")
+
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            while True:
+                print("Enter the package name to install (or type 'q' to quit):")
+                package_name = input()
+                
+                if package_name.lower() == 'q':
+                    break
+
+                if check_package_availability(package_name):
+                    print(f"Package '{package_name}' already installed")
+                else:
+                    install_package(package_name)
+        
+        elif choice == '2':
+            print("Enter package names separated by commas (or type 'q' to quit):")
+            package_list = input()
+            
+            if package_list.lower() == 'q':
+                continue
+
+            install_packages(package_list)
+        
+        elif choice == '3':
+            view_extensions()
+        
+        elif choice == '4':
+            update_packages()
+        
+        elif choice == '0':
+            break
+        
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == '__main__':
+    main()
+
