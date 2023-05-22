@@ -3,22 +3,21 @@ import time
 
 def check_package_availability(package):
     try:
-        subprocess.check_output(['pip', 'show', package])
+        subprocess.run(['pip', 'show', package], check=True, capture_output=True)
         return True
     except subprocess.CalledProcessError:
         return False
 
 def install_package(package):
     try:
-        subprocess.check_call(['pip', 'install', package])
+        subprocess.run(['pip', 'install', package], check=True)
         print(f"Successfully installed {package}")
     except subprocess.CalledProcessError:
         print(f"Error installing {package}")
 
 def install_packages(package_list):
-    packages = package_list.split(',')
+    packages = [package.strip() for package in package_list.split(',')]
     for package in packages:
-        package = package.strip()
         if check_package_availability(package):
             print(f"Package '{package}' already installed")
         else:
@@ -26,20 +25,20 @@ def install_packages(package_list):
 
 def view_extensions():
     try:
-        output = subprocess.check_output(['pip', 'list', '--outdated'])
+        output = subprocess.run(['pip', 'list', '--outdated'], check=True, capture_output=True, text=True)
         print("Extensions:")
         print("-----------")
-        print(output.decode('utf-8'))
+        print(output.stdout)
     except subprocess.CalledProcessError:
         print("Error retrieving extension information.")
 
 def update_packages():
     try:
         # Update pip
-        subprocess.check_call(['pip', 'install', '--upgrade', 'pip'])
+        subprocess.run(['pip', 'install', '--upgrade', 'pip'], check=True)
         
         # Update other packages
-        subprocess.check_call('pip list --outdated  | grep -v \'^-e\' | cut -d \'=\' -f 1 | xargs -n1 pip install -U', shell=True)
+        subprocess.run('pip list --outdated  | grep -v \'^-e\' | cut -d \'=\' -f 1 | xargs -n1 pip install -U', shell=True, check=True)
         
         print("Packages updated successfully.")
     except subprocess.CalledProcessError:
