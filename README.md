@@ -109,8 +109,8 @@ The Package Installer provides the following options:
 In Single Mode, you can install a single package by following these steps:
 
 1. Enter the package name to install.
-
-2. Repeat step 1 to install more packages or enter 'q' to quit.
+2. Enter the Desired Version.
+3. Repeat step 1 to install more packages or enter 'q' to quit.
 
 ## Multi Mode
 
