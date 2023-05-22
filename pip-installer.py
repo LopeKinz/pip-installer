@@ -34,10 +34,24 @@ def check_package_availability(package):
         return False
 
 
-def install_package(package):
+def get_available_versions(package):
     try:
-        subprocess.run(['pip', 'install', package], check=True)
-        print(f"Successfully installed {package}")
+        output = subprocess.run(['pip', 'search', package], check=True, capture_output=True, text=True)
+        lines = output.stdout.strip().split('\n')
+        versions = [line.split('(')[1].split(')')[0].strip() for line in lines]
+        return versions
+    except subprocess.CalledProcessError:
+        return []
+
+
+def install_package(package, version=None):
+    try:
+        if version:
+            subprocess.run(['pip', 'install', f'{package}=={version}'], check=True)
+            print(f"Successfully installed {package} version {version}")
+        else:
+            subprocess.run(['pip', 'install', package], check=True)
+            print(f"Successfully installed {package}")
     except subprocess.CalledProcessError:
         print(f"Error installing {package}")
         sys.exit(PACKAGE_INSTALLATION_ERROR)
@@ -142,11 +156,27 @@ def main():
                     if check_package_availability(package_name):
                         print(f"Package '{package_name}' already installed")
                     else:
-                        try:
-                            install_package(package_name)
-                            num_updated_installed += 1
-                        except subprocess.CalledProcessError:
-                            errors += 1
+                        versions = get_available_versions(package_name)
+                        if versions:
+                            print(f"Available versions for {package_name}:")
+                            for i, version in enumerate(versions, start=1):
+                                print(f"{i}. {version}")
+                            version_choice = input("Choose the version number (or press Enter for the latest version): ")
+                            if version_choice.isdigit() and int(version_choice) in range(1, len(versions) + 1):
+                                version = versions[int(version_choice) - 1]
+                            else:
+                                version = None
+                            try:
+                                install_package(package_name, version)
+                                num_updated_installed += 1
+                            except subprocess.CalledProcessError:
+                                errors += 1
+                        else:
+                            try:
+                                install_package(package_name)
+                                num_updated_installed += 1
+                            except subprocess.CalledProcessError:
+                                errors += 1
 
                 display_stats(start_time, errors, num_updated_installed)
 
