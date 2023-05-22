@@ -1,5 +1,22 @@
 import subprocess
 import time
+import sys
+
+
+def check_pip_availability():
+    try:
+        subprocess.run(['pip', '--version'], check=True, capture_output=True)
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+def install_pip():
+    try:
+        subprocess.run([sys.executable, '-m', 'ensurepip', '--upgrade'], check=True)
+        print("Successfully installed pip.")
+    except subprocess.CalledProcessError:
+        print("Error installing pip.")
+
 
 def check_package_availability(package):
     try:
@@ -56,6 +73,11 @@ def display_stats(start_time, errors, num_updated_installed):
 
 def main():
     while True:
+        
+        if not check_pip_availability():
+        print("pip is not installed. Installing pip...")
+        install_pip()
+        
         print("===================================")
         print("           Package Installer       ")
         print("===================================")
