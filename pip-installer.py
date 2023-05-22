@@ -75,8 +75,8 @@ def main():
     while True:
         
         if not check_pip_availability():
-        print("pip is not installed. Installing pip...")
-        install_pip()
+            print("pip is not installed. Installing pip...")
+            install_pip()
         
         print("===================================")
         print("           Package Installer       ")
