@@ -1,10 +1,10 @@
-import os
-import subprocess
-import time
-import sys
-import platform
-import traceback
 import json
+import os
+import platform
+import subprocess
+import sys
+import time
+import traceback
 
 PIP_NOT_INSTALLED_ERROR = 1
 PACKAGE_INSTALLATION_ERROR = 2
