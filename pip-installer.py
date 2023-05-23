@@ -9,6 +9,68 @@ PIP_NOT_INSTALLED_ERROR = 1
 PACKAGE_INSTALLATION_ERROR = 2
 PACKAGE_UPDATE_ERROR = 3
 
+import os
+
+
+def create_package(author, name, version, requirements, main_file_path):
+    # Create package directory
+    package_dir = f"{name.lower().replace(' ', '_')}"
+    os.makedirs(package_dir)
+
+    # Create package files
+    with open(os.path.join(package_dir, '__init__.py'), 'w') as init_file:
+        pass
+
+    if main_file_path:
+        # Read content from user-specified file path
+        with open(main_file_path, 'r') as main_content_file:
+            main_content = main_content_file.read()
+    else:
+        # Use default content for main.py if no file path is provided
+        main_content = f'''
+def hello():
+    print("Hello, {name}!")
+
+if __name__ == "__main__":
+    hello()
+'''
+
+    with open(os.path.join(package_dir, 'main.py'), 'w') as main_file:
+        main_file.write(main_content)
+
+    with open('setup.py', 'w') as setup_file:
+        setup_file.write(f'''
+from setuptools import setup
+
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
+setup(
+    name='{name}',
+    version='{version}',
+    author='{author}',
+    description='{name} package',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    packages=['{package_dir}'],
+    install_requires={requirements},
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+    python_requires='>=3.6',
+)
+''')
+
+    with open('README.md', 'w') as readme_file:
+        readme_file.write(f'# {name}\n\nThis is the {name} package.\n')
+
+    # Print success message
+    print(f"Package '{name}' created successfully!")
+
+
+
 
 def display_stats(start_time, errors, num_updated_installed):
     end_time = time.time()
@@ -223,6 +285,7 @@ def main():
             print("3. View Updatable Extensions")
             print("4. Update Packages")
             print("5. Uninstall Package")
+            print("6. Create Own Package")
             print("0. Exit")
             print("-----------------------------------")
             print("Author: LopeKinz")
@@ -329,6 +392,17 @@ def main():
                     errors += 1
 
                 display_stats(start_time, errors, num_updated_installed)
+                
+            elif choice == '6':
+                author = input("Enter the author name: ")
+                name = input("Enter the package name: ")
+                version = input("Enter the package version: ")
+                requirements = input("Enter the package requirements (comma-separated): ").split(',')
+                main_file_path = input("Enter the path to the main.py file (leave blank to use default content): ")
+
+                # Create the package
+                create_package(author, name, version, requirements, main_file_path)
+
 
             elif choice == '0':
                 break
