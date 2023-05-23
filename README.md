@@ -88,12 +88,7 @@ Package Installer is a command-line tool that allows you to install, view, and u
    cd pip-installer
    ```
 
-3. Install the required packages:
-   ```
-   pip install -r requirements.txt
-   ```
-
-4. Run the script:
+3. Run the script:
    ```
    python installer.py
    ```
