@@ -101,16 +101,13 @@ Package Installer is a command-line tool that allows you to install, view, and u
 ## Options
 
 The Package Installer provides the following options:
+## Features
 
-- **Single Mode (1):** Install a single package.
-
-- **Multi Mode (2):** Install multiple packages.
-
-- **View Extensions (3):** View outdated packages.
-
-- **Update Packages (4):** Update all packages.
-
-- **Exit (0):** Exit the program.
+- Single Mode: Install a single package with optional version specification.
+- Multi Mode: Install multiple packages listed in a comma-separated format.
+- View Updatable Extensions: Display a list of installed packages with available updates.
+- Update Packages: Update pip and all installed packages.
+- Uninstall Package: Remove a specific package from the system.
 
 ## Single Mode
 
@@ -135,6 +132,10 @@ In View Extensions mode, you can view outdated packages by running the command.
 ## Update Packages
 
 In Update Packages mode, you can update all installed packages by running the command.
+
+## Uninstall Packages
+
+In Uninstall mode you, can easily uninstall any package by their name.
 
 ## Statistics
 
