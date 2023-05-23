@@ -3,10 +3,43 @@ import time
 import sys
 import platform
 import traceback
+import json
 
 PIP_NOT_INSTALLED_ERROR = 1
 PACKAGE_INSTALLATION_ERROR = 2
 PACKAGE_UPDATE_ERROR = 3
+
+
+def display_stats(start_time, errors, num_updated_installed):
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+
+    print("\n---------- Statistics ----------")
+    print(f"Time elapsed: {elapsed_time:.2f} seconds")
+    print(f"Errors encountered: {errors}")
+    print(f"Number of updated/installed packages: {num_updated_installed}")
+    print("---------------------------------")
+
+def get_installed_packages_count():
+    try:
+        output = subprocess.run(['pip', 'list'], check=True, capture_output=True, text=True)
+        lines = output.stdout.strip().split('\n')
+        # Subtract 2 from the total count to exclude header and footer lines
+        count = max(len(lines) - 2, 0)
+        return count
+    except subprocess.CalledProcessError:
+        return 0
+
+def get_updatable_packages_count():
+    try:
+        output = subprocess.run(['pip', 'list', '--outdated'], check=True, capture_output=True, text=True)
+        lines = output.stdout.strip().split('\n')
+        # Subtract 2 from the total count to exclude header and footer lines
+        count = max(len(lines) - 2, 0)
+        return count
+    except subprocess.CalledProcessError:
+        return 0
+
 
 
 def check_pip_availability():
@@ -44,26 +77,49 @@ def get_available_versions(package):
         return []
 
 
-def install_package(package, version=None):
+def install_package(package, version=None, combined=False):
+    start_time = time.time()
+    errors = 0
+    num_updated_installed = 0
+
     try:
         if version:
             subprocess.run(['pip', 'install', f'{package}=={version}'], check=True)
             print(f"Successfully installed {package} version {version}")
+            num_updated_installed += 1
         else:
             subprocess.run(['pip', 'install', package], check=True)
             print(f"Successfully installed {package}")
+            num_updated_installed += 1
+
     except subprocess.CalledProcessError:
         print(f"Error installing {package}")
-        sys.exit(PACKAGE_INSTALLATION_ERROR)
+        errors += 1
+    if combined is False:
+        display_stats(start_time, errors, num_updated_installed)
 
 
 def install_packages(package_list):
+    start_time = time.time()
+    errors = 0
+    num_updated_installed = 0
+
     packages = [package.strip() for package in package_list.split(',')]
     for package in packages:
         if check_package_availability(package):
             print(f"Package '{package}' already installed")
         else:
-            install_package(package)
+            if package.strip() != '':
+                result = install_package(package,combined=True)
+                if result != 0:
+                    errors += 1
+                else:
+                    num_updated_installed += 1
+
+    display_stats(start_time, errors, num_updated_installed)
+    return errors
+
+
 
 
 def view_extensions():
@@ -75,40 +131,52 @@ def view_extensions():
     except subprocess.CalledProcessError:
         print("Error retrieving extension information.")
 
+
+
 def update_packages():
     try:
+        start_time = time.time()
+        num_updated_packages = 0
+        errors = 0
+
         # Update pip
         subprocess.run(['pip', 'install', '--upgrade', 'pip'], check=True)
+        num_updated_packages += 1
 
         # Update other packages
         outdated_packages = subprocess.run(
-            'pip list --outdated --format=legacy | grep -v \'^-e\' | cut -d \'=\' -f 1',
+            'pip list --outdated --format=json',
             shell=True, check=True, capture_output=True, text=True
         )
 
-        packages = outdated_packages.stdout.strip().split('\n')
+        packages = json.loads(outdated_packages.stdout)
 
-        num_updated_packages = 0
         for package in packages:
-            if package.strip() != '':
+            package_name = package['name']
+            if package_name.strip() != '':
                 try:
-                    subprocess.run(['pip', 'install', '-U', package], check=True)
+                    subprocess.run(['pip', 'install', '-U', package_name], check=True)
                     num_updated_packages += 1
                 except subprocess.CalledProcessError as e:
                     error_message = e.stderr
                     if error_message is not None:
                         error_message = error_message.decode().strip()
                         if not error_message.startswith("ERROR: Invalid requirement:"):
-                            print(f"Error updating package '{package}': {error_message}")
+                            print(f"Error updating package '{package_name}': {error_message}")
                         else:
-                            print(f"Skipped updating package '{package}' due to an error")
+                            print(f"Skipped updating package '{package_name}' due to an error")
                     else:
-                        print(f"Error updating package '{package}'")
+                        print(f"Error updating package '{package_name}'")
+                        errors += 1
+                else:
+                    print(f"Updated package '{package_name}'")
 
-        if num_updated_packages == 0:
+        if num_updated_packages == 1:
             print("All packages are up to date.")
         else:
-            print(f"{num_updated_packages} packages updated successfully.")
+            print(f"{num_updated_packages - 1} packages updated successfully.")
+
+        display_stats(start_time, errors, num_updated_packages)
     except subprocess.CalledProcessError:
         print("Error updating packages.")
         sys.exit(PACKAGE_UPDATE_ERROR)
@@ -119,15 +187,6 @@ def update_packages():
 
 
 
-def display_stats(start_time, errors, num_updated_installed):
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-
-    print("\n---------- Statistics ----------")
-    print(f"Time elapsed: {elapsed_time:.2f} seconds")
-    print(f"Errors encountered: {errors}")
-    print(f"Number of updated/installed packages: {num_updated_installed}")
-    print("---------------------------------")
 
 
 def display_crash_screen(error):
@@ -149,6 +208,8 @@ def display_crash_screen(error):
 
 def main():
     try:
+        installed_count = get_installed_packages_count()
+        updatable_count = get_updatable_packages_count()
         while True:
             if not check_pip_availability():
                 print("pip is not installed. Installing pip...")
@@ -159,12 +220,16 @@ def main():
             print("===================================")
             print("1. Single Mode")
             print("2. Multi Mode")
-            print("3. View Extensions")
+            print("3. View Updatable Extensions")
             print("4. Update Packages")
+            print("5. Uninstall Package")
             print("0. Exit")
             print("-----------------------------------")
             print("Author: LopeKinz")
             print("GitHub: https://github.com/LopeKinz")
+            print("-----------------------------------")
+            print("Installed packages:", installed_count)
+            print("Updatable packages:", updatable_count)
             print("-----------------------------------")
 
             choice = input("Enter your choice: ")
@@ -225,7 +290,6 @@ def main():
                 except subprocess.CalledProcessError:
                     errors += 1
 
-                display_stats(start_time, errors, num_updated_installed)
 
             elif choice == '3':
                 start_time = time.time()
@@ -234,7 +298,6 @@ def main():
 
                 view_extensions()
 
-                display_stats(start_time, errors, num_updated_installed)
 
             elif choice == '4':
                 start_time = time.time()
@@ -244,6 +307,24 @@ def main():
                 try:
                     update_packages()
                     num_updated_installed = 1
+                except subprocess.CalledProcessError:
+                    errors += 1
+
+
+            elif choice == '5':
+                start_time = time.time()
+                errors = 0
+                num_updated_installed = 0
+
+                print("Enter the package name to uninstall (or type 'q' to quit):")
+                package_name = input()
+
+                if package_name.lower() == 'q':
+                    continue
+
+                try:
+                    subprocess.run(['pip', 'uninstall', package_name], check=True)
+                    num_updated_installed += 1
                 except subprocess.CalledProcessError:
                     errors += 1
 

@@ -36,6 +36,14 @@ For any questions or inquiries, feel free to reach out to the project maintainer
 
 ## Changelog
 
+### Version 1.3.0 (2023.05.23)
+
+- Added Uninstall Option
+- Added Stats to the Main Menu
+- Fixed update_packages() not returning the full list of outdated packages
+- Implementing Stats Correctly
+- fixed a bug displaying the stats twice
+
 ### Version 1.2.1 (2023.05.22)
 
 - Fixed update_packages() 
