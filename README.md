@@ -107,6 +107,7 @@ The Package Installer provides the following options:
 - View Updatable Extensions: Display a list of installed packages with available updates.
 - Update Packages: Update pip and all installed packages.
 - Uninstall Package: Remove a specific package from the system.
+- Create Own Package: Create your own PiP Package.
 
 ## Single Mode
 
