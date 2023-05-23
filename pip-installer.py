@@ -1,3 +1,4 @@
+import os
 import subprocess
 import time
 import sys
@@ -8,8 +9,6 @@ import json
 PIP_NOT_INSTALLED_ERROR = 1
 PACKAGE_INSTALLATION_ERROR = 2
 PACKAGE_UPDATE_ERROR = 3
-
-import os
 
 
 def create_package(author, name, version, requirements, main_file_path):
@@ -70,8 +69,6 @@ setup(
     print(f"Package '{name}' created successfully!")
 
 
-
-
 def display_stats(start_time, errors, num_updated_installed):
     end_time = time.time()
     elapsed_time = end_time - start_time
@@ -82,26 +79,29 @@ def display_stats(start_time, errors, num_updated_installed):
     print(f"Number of updated/installed packages: {num_updated_installed}")
     print("---------------------------------")
 
+
 def get_installed_packages_count():
     try:
-        output = subprocess.run(['pip', 'list'], check=True, capture_output=True, text=True)
+        output = subprocess.run(
+            ['pip', 'list'], check=True, capture_output=True, text=True)
         lines = output.stdout.strip().split('\n')
         # Subtract 2 from the total count to exclude header and footer lines
         count = max(len(lines) - 2, 0)
         return count
     except subprocess.CalledProcessError:
         return 0
+
 
 def get_updatable_packages_count():
     try:
-        output = subprocess.run(['pip', 'list', '--outdated'], check=True, capture_output=True, text=True)
+        output = subprocess.run(
+            ['pip', 'list', '--outdated'], check=True, capture_output=True, text=True)
         lines = output.stdout.strip().split('\n')
         # Subtract 2 from the total count to exclude header and footer lines
         count = max(len(lines) - 2, 0)
         return count
     except subprocess.CalledProcessError:
         return 0
-
 
 
 def check_pip_availability():
@@ -114,7 +114,8 @@ def check_pip_availability():
 
 def install_pip():
     try:
-        subprocess.run([sys.executable, '-m', 'ensurepip', '--upgrade'], check=True)
+        subprocess.run(
+            [sys.executable, '-m', 'ensurepip', '--upgrade'], check=True)
         print("Successfully installed pip.")
     except subprocess.CalledProcessError:
         print("Error installing pip.")
@@ -123,7 +124,8 @@ def install_pip():
 
 def check_package_availability(package):
     try:
-        subprocess.run(['pip', 'show', package], check=True, capture_output=True)
+        subprocess.run(['pip', 'show', package],
+                       check=True, capture_output=True)
         return True
     except subprocess.CalledProcessError:
         return False
@@ -131,7 +133,8 @@ def check_package_availability(package):
 
 def get_available_versions(package):
     try:
-        output = subprocess.run(['pip', 'search', package], check=True, capture_output=True, text=True)
+        output = subprocess.run(
+            ['pip', 'search', package], check=True, capture_output=True, text=True)
         lines = output.stdout.strip().split('\n')
         versions = [line.split('(')[1].split(')')[0].strip() for line in lines]
         return versions
@@ -146,7 +149,8 @@ def install_package(package, version=None, combined=False):
 
     try:
         if version:
-            subprocess.run(['pip', 'install', f'{package}=={version}'], check=True)
+            subprocess.run(
+                ['pip', 'install', f'{package}=={version}'], check=True)
             print(f"Successfully installed {package} version {version}")
             num_updated_installed += 1
         else:
@@ -172,7 +176,7 @@ def install_packages(package_list):
             print(f"Package '{package}' already installed")
         else:
             if package.strip() != '':
-                result = install_package(package,combined=True)
+                result = install_package(package, combined=True)
                 if result != 0:
                     errors += 1
                 else:
@@ -182,17 +186,15 @@ def install_packages(package_list):
     return errors
 
 
-
-
 def view_extensions():
     try:
-        output = subprocess.run(['pip', 'list', '--outdated'], check=True, capture_output=True, text=True)
+        output = subprocess.run(
+            ['pip', 'list', '--outdated'], check=True, capture_output=True, text=True)
         print("Extensions:")
         print("-----------")
         print(output.stdout)
     except subprocess.CalledProcessError:
         print("Error retrieving extension information.")
-
 
 
 def update_packages():
@@ -217,16 +219,19 @@ def update_packages():
             package_name = package['name']
             if package_name.strip() != '':
                 try:
-                    subprocess.run(['pip', 'install', '-U', package_name], check=True)
+                    subprocess.run(
+                        ['pip', 'install', '-U', package_name], check=True)
                     num_updated_packages += 1
                 except subprocess.CalledProcessError as e:
                     error_message = e.stderr
                     if error_message is not None:
                         error_message = error_message.decode().strip()
                         if not error_message.startswith("ERROR: Invalid requirement:"):
-                            print(f"Error updating package '{package_name}': {error_message}")
+                            print(
+                                f"Error updating package '{package_name}': {error_message}")
                         else:
-                            print(f"Skipped updating package '{package_name}' due to an error")
+                            print(
+                                f"Skipped updating package '{package_name}' due to an error")
                     else:
                         print(f"Error updating package '{package_name}'")
                         errors += 1
@@ -242,13 +247,6 @@ def update_packages():
     except subprocess.CalledProcessError:
         print("Error updating packages.")
         sys.exit(PACKAGE_UPDATE_ERROR)
-
-
-
-
-
-
-
 
 
 def display_crash_screen(error):
@@ -317,7 +315,8 @@ def main():
                             print(f"Available versions for {package_name}:")
                             for i, version in enumerate(versions, start=1):
                                 print(f"{i}. {version}")
-                            version_choice = input("Choose the version number (or press Enter for the latest version): ")
+                            version_choice = input(
+                                "Choose the version number (or press Enter for the latest version): ")
                             if version_choice.isdigit() and int(version_choice) in range(1, len(versions) + 1):
                                 version = versions[int(version_choice) - 1]
                             else:
@@ -353,14 +352,12 @@ def main():
                 except subprocess.CalledProcessError:
                     errors += 1
 
-
             elif choice == '3':
                 start_time = time.time()
                 errors = 0
                 num_updated_installed = 0
 
                 view_extensions()
-
 
             elif choice == '4':
                 start_time = time.time()
@@ -372,7 +369,6 @@ def main():
                     num_updated_installed = 1
                 except subprocess.CalledProcessError:
                     errors += 1
-
 
             elif choice == '5':
                 start_time = time.time()
@@ -386,23 +382,26 @@ def main():
                     continue
 
                 try:
-                    subprocess.run(['pip', 'uninstall', package_name], check=True)
+                    subprocess.run(
+                        ['pip', 'uninstall', package_name], check=True)
                     num_updated_installed += 1
                 except subprocess.CalledProcessError:
                     errors += 1
 
                 display_stats(start_time, errors, num_updated_installed)
-                
+
             elif choice == '6':
                 author = input("Enter the author name: ")
                 name = input("Enter the package name: ")
                 version = input("Enter the package version: ")
-                requirements = input("Enter the package requirements (comma-separated): ").split(',')
-                main_file_path = input("Enter the path to the main.py file (leave blank to use default content): ")
+                requirements = input(
+                    "Enter the package requirements (comma-separated): ").split(',')
+                main_file_path = input(
+                    "Enter the path to the main.py file (leave blank to use default content): ")
 
                 # Create the package
-                create_package(author, name, version, requirements, main_file_path)
-
+                create_package(author, name, version,
+                               requirements, main_file_path)
 
             elif choice == '0':
                 break
