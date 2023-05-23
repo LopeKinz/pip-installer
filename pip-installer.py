@@ -87,9 +87,7 @@ def get_installed_packages_count():
                                 capture_output=True,
                                 text=True)
         lines = output.stdout.strip().split("\n")
-        # Subtract 2 from the total count to exclude header and footer lines
-        count = max(len(lines) - 2, 0)
-        return count
+        return max(len(lines) - 2, 0)
     except subprocess.CalledProcessError:
         return 0
 
@@ -101,9 +99,7 @@ def get_updatable_packages_count():
                                 capture_output=True,
                                 text=True)
         lines = output.stdout.strip().split("\n")
-        # Subtract 2 from the total count to exclude header and footer lines
-        count = max(len(lines) - 2, 0)
-        return count
+        return max(len(lines) - 2, 0)
     except subprocess.CalledProcessError:
         return 0
 
@@ -143,8 +139,7 @@ def get_available_versions(package):
                                 capture_output=True,
                                 text=True)
         lines = output.stdout.strip().split("\n")
-        versions = [line.split("(")[1].split(")")[0].strip() for line in lines]
-        return versions
+        return [line.split("(")[1].split(")")[0].strip() for line in lines]
     except subprocess.CalledProcessError:
         return []
 
@@ -159,12 +154,10 @@ def install_package(package, version=None, combined=False):
             subprocess.run(["pip", "install", f"{package}=={version}"],
                            check=True)
             print(f"Successfully installed {package} version {version}")
-            num_updated_installed += 1
         else:
             subprocess.run(["pip", "install", package], check=True)
             print(f"Successfully installed {package}")
-            num_updated_installed += 1
-
+        num_updated_installed += 1
     except subprocess.CalledProcessError:
         print(f"Error installing {package}")
         errors += 1
@@ -181,14 +174,13 @@ def install_packages(package_list):
     for package in packages:
         if check_package_availability(package):
             print(f"Package '{package}' already installed")
-        else:
-            if package.strip() != "":
-                result = install_package(package, combined=True)
-                if result != 0:
-                    errors += 1
-                else:
-                    num_updated_installed += 1
+        elif package.strip() != "":
+            result = install_package(package, combined=True)
+            if result == 0:
+                num_updated_installed += 1
 
+            else:
+                errors += 1
     display_stats(start_time, errors, num_updated_installed)
     return errors
 
@@ -209,13 +201,11 @@ def view_extensions():
 def update_packages():
     try:
         start_time = time.time()
-        num_updated_packages = 0
         errors = 0
 
         # Update pip
         subprocess.run(["pip", "install", "--upgrade", "pip"], check=True)
-        num_updated_packages += 1
-
+        num_updated_packages = 0 + 1
         # Update other packages
         outdated_packages = subprocess.run(
             "pip list --outdated --format=json",
@@ -328,33 +318,31 @@ def main():
 
                     if check_package_availability(package_name):
                         print(f"Package '{package_name}' already installed")
+                    elif versions := get_available_versions(package_name):
+                        print(f"Available versions for {package_name}:")
+                        for i, version in enumerate(versions, start=1):
+                            print(f"{i}. {version}")
+                        version_choice = input(
+                            "Choose the version number (or press Enter for the latest version): "
+                        )
+                        version = (
+                            versions[int(version_choice) - 1]
+                            if version_choice.isdigit()
+                            and int(version_choice)
+                            in range(1, len(versions) + 1)
+                            else None
+                        )
+                        try:
+                            install_package(package_name, version)
+                            num_updated_installed += 1
+                        except subprocess.CalledProcessError:
+                            errors += 1
                     else:
-                        versions = get_available_versions(package_name)
-                        if versions:
-                            print(f"Available versions for {package_name}:")
-                            for i, version in enumerate(versions, start=1):
-                                print(f"{i}. {version}")
-                            version_choice = input(
-                                "Choose the version number (or press Enter for the latest version): "
-                            )
-                            if version_choice.isdigit() and int(
-                                    version_choice) in range(
-                                        1,
-                                        len(versions) + 1):
-                                version = versions[int(version_choice) - 1]
-                            else:
-                                version = None
-                            try:
-                                install_package(package_name, version)
-                                num_updated_installed += 1
-                            except subprocess.CalledProcessError:
-                                errors += 1
-                        else:
-                            try:
-                                install_package(package_name)
-                                num_updated_installed += 1
-                            except subprocess.CalledProcessError:
-                                errors += 1
+                        try:
+                            install_package(package_name)
+                            num_updated_installed += 1
+                        except subprocess.CalledProcessError:
+                            errors += 1
 
                 display_stats(start_time, errors, num_updated_installed)
 
