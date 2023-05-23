@@ -1,8 +1,53 @@
 import subprocess
-import sys
-import tkinter as tk
-import tkinter.scrolledtext as tkst
 import time
+import sys
+import platform
+import traceback
+import json
+import tkinter as tk
+from tkinter import messagebox, scrolledtext
+
+PIP_NOT_INSTALLED_ERROR = 1
+PACKAGE_INSTALLATION_ERROR = 2
+PACKAGE_UPDATE_ERROR = 3
+
+
+def display_stats(start_time, errors, num_updated_installed):
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+
+    result_text = f"\n---------- Statistics ----------\n"
+    result_text += f"Time elapsed: {elapsed_time:.2f} seconds\n"
+    result_text += f"Errors encountered: {errors}\n"
+    result_text += f"Number of updated/installed packages: {num_updated_installed}\n"
+    result_text += "---------------------------------"
+    command_output.config(state=tk.NORMAL)
+    command_output.delete(1.0, tk.END)
+    command_output.insert(tk.END, result_text)
+    command_output.config(state=tk.DISABLED)
+
+
+def get_installed_packages_count():
+    try:
+        output = subprocess.run(['pip', 'list'], check=True, capture_output=True, text=True)
+        lines = output.stdout.strip().split('\n')
+        # Subtract 2 from the total count to exclude header and footer lines
+        count = max(len(lines) - 2, 0)
+        return count
+    except subprocess.CalledProcessError:
+        return 0
+
+
+def get_updatable_packages_count():
+    try:
+        output = subprocess.run(['pip', 'list', '--outdated'], check=True, capture_output=True, text=True)
+        lines = output.stdout.strip().split('\n')
+        # Subtract 2 from the total count to exclude header and footer lines
+        count = max(len(lines) - 2, 0)
+        return count
+    except subprocess.CalledProcessError:
+        return 0
+
 
 def check_pip_availability():
     try:
@@ -11,12 +56,15 @@ def check_pip_availability():
     except subprocess.CalledProcessError:
         return False
 
+
 def install_pip():
     try:
         subprocess.run([sys.executable, '-m', 'ensurepip', '--upgrade'], check=True)
-        console_output.insert(tk.END, "Successfully installed pip.\n")
+        messagebox.showinfo("Installation Complete", "Successfully installed pip.")
     except subprocess.CalledProcessError:
-        console_output.insert(tk.END, "Error installing pip.\n")
+        messagebox.showerror("Installation Error", "Error installing pip.")
+        sys.exit(PIP_NOT_INSTALLED_ERROR)
+
 
 def check_package_availability(package):
     try:
@@ -25,177 +73,135 @@ def check_package_availability(package):
     except subprocess.CalledProcessError:
         return False
 
-def install_package(package):
+
+def get_available_versions(package):
     try:
-        subprocess.run(['pip', 'install', package], check=True)
-        console_output.insert(tk.END, f"Successfully installed {package}\n")
+        output = subprocess.run(['pip', 'search', package], check=True, capture_output=True, text=True)
+        lines = output.stdout.strip().split('\n')
+        versions = [line.split('(')[1].split(')')[0].strip() for line in lines]
+        return versions
     except subprocess.CalledProcessError:
-        console_output.insert(tk.END, f"Error installing {package}\n")
+        return []
 
-def install_packages(package_list):
-    packages = [package.strip() for package in package_list.split(',')]
-    for package in packages:
-        if check_package_availability(package):
-            console_output.insert(tk.END, f"Package '{package}' already installed\n")
-        else:
-            install_package(package)
 
-def view_extensions():
-    try:
-        output = subprocess.run(['pip', 'list', '--outdated'], check=True, capture_output=True, text=True)
-        console_output.insert(tk.END, "Extensions:\n")
-        console_output.insert(tk.END, "-----------\n")
-        console_output.insert(tk.END, output.stdout)
-    except subprocess.CalledProcessError:
-        console_output.insert(tk.END, "Error retrieving extension information.\n")
-
-def update_packages():
-    try:
-        # Update pip
-        subprocess.run(['pip', 'install', '--upgrade', 'pip'], check=True)
-
-        # Update other packages
-        subprocess.run('pip list --outdated  | grep -v \'^-e\' | cut -d \'=\' -f 1 | xargs -n1 pip install -U', shell=True, check=True)
-
-        console_output.insert(tk.END, "Packages updated successfully.\n")
-    except subprocess.CalledProcessError:
-        console_output.insert(tk.END, "Error updating packages.\n")
-
-def display_stats(start_time, errors, num_updated_installed):
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-
-    console_output.insert(tk.END, "---------- Statistics ----------\n")
-    console_output.insert(tk.END, f"Time elapsed: {elapsed_time:.2f} seconds\n")
-    console_output.insert(tk.END, f"Errors encountered: {errors}\n")
-    console_output.insert(tk.END, f"Number of updated/installed packages: {num_updated_installed}\n")
-    console_output.insert(tk.END, "---------------------------------\n")
-
-def single_mode():
+def install_package(package, version=None, combined=False):
     start_time = time.time()
     errors = 0
     num_updated_installed = 0
 
-    console_output.insert(tk.END, "Enter the package name to install (or type 'q' to quit):\n")
-    
-    while True:
-        package_name = entry.get()
-        entry.delete(0, tk.END)
-        
-        if package_name.lower() == 'q':
-            break
-
-        if check_package_availability(package_name):
-            console_output.insert(tk.END, f"Package '{package_name}' already installed\n")
-        else:
-            try:
-                install_package(package_name)
-                num_updated_installed += 1
-            except subprocess.CalledProcessError:
-                errors += 1
-    
-    display_stats(start_time, errors, num_updated_installed)
-
-def multi_mode():
-    start_time = time.time()
-    errors = 0
-    num_updated_installed = 0
-
-    package_list = entry.get()
-    entry.delete(0, tk.END)
-    
-    if package_list.lower() == 'q':
-        return
-
     try:
-        install_packages(package_list)
-        num_updated_installed = len(package_list.split(','))
+        if version:
+            subprocess.run(['pip', 'install', f'{package}=={version}'], check=True)
+            messagebox.showinfo("Installation Complete", f"Successfully installed {package} version {version}")
+            num_updated_installed += 1
+        else:
+            subprocess.run(['pip', 'install', package], check=True)
+            messagebox.showinfo("Installation Complete", f"Successfully installed {package}")
+            num_updated_installed += 1
     except subprocess.CalledProcessError:
         errors += 1
-    
+
     display_stats(start_time, errors, num_updated_installed)
 
-def on_choice_selected():
-    choice = choice_var.get()
 
-    if choice == '1':
-        single_mode()
-    elif choice == '2':
-        multi_mode()
-    elif choice == '3':
-        view_extensions()
-    elif choice == '4':
-        update_packages()
-    elif choice == '0':
-        root.destroy()
-    else:
-        console_output.insert(tk.END, "Invalid choice. Please try again.\n")
+def update_package(package, version=None):
+    start_time = time.time()
+    errors = 0
+    num_updated_installed = 0
 
-root = tk.Tk()
-root.title("Package Installer")
+    try:
+        if version:
+            subprocess.run(['pip', 'install', f'{package}=={version}', '--upgrade'], check=True)
+            messagebox.showinfo("Update Complete", f"Successfully updated {package} to version {version}")
+            num_updated_installed += 1
+        else:
+            subprocess.run(['pip', 'install', '--upgrade', package], check=True)
+            messagebox.showinfo("Update Complete", f"Successfully updated {package}")
+            num_updated_installed += 1
+    except subprocess.CalledProcessError:
+        errors += 1
 
-# Main Frame
-main_frame = tk.Frame(root, padx=10, pady=10)
-main_frame.pack()
+    display_stats(start_time, errors, num_updated_installed)
 
-# Title
-title_label = tk.Label(main_frame, text="Package Installer", font=("Arial", 16, "bold"))
-title_label.pack(pady=10)
 
-# Choice
-choice_var = tk.StringVar()
-choice_var.set('1')
+def main():
+    def execute_command():
+        command_output.config(state=tk.NORMAL)
+        command_output.delete(1.0, tk.END)
 
-choice_frame = tk.Frame(main_frame)
-choice_frame.pack()
+        if option_var.get() == "single":
+            package_name = package_entry.get()
+            version = version_entry.get()
+            install_package(package_name, version)
 
-choice_label = tk.Label(choice_frame, text="Choose an option:")
-choice_label.grid(row=0, column=0, sticky=tk.W)
+        elif option_var.get() == "multi":
+            package_list = package_entry.get()
+            install_packages(package_list)
 
-choice_single_mode = tk.Radiobutton(choice_frame, text="Single Mode", variable=choice_var, value='1')
-choice_single_mode.grid(row=1, column=0, sticky=tk.W)
+        elif option_var.get() == "update":
+            package_name = package_entry.get()
+            version = version_entry.get()
+            update_package(package_name, version)
 
-choice_multi_mode = tk.Radiobutton(choice_frame, text="Multi Mode", variable=choice_var, value='2')
-choice_multi_mode.grid(row=2, column=0, sticky=tk.W)
+        # Update command output with the result
+        result_text = "Command output..."
+        command_output.insert(tk.END, result_text)
+        command_output.config(state=tk.DISABLED)
 
-choice_view_extensions = tk.Radiobutton(choice_frame, text="View Extensions", variable=choice_var, value='3')
-choice_view_extensions.grid(row=3, column=0, sticky=tk.W)
+    def install_packages(package_list):
+        packages = package_list.split(',')
+        for package in packages:
+            package = package.strip()
+            if package:
+                install_package(package)
 
-choice_update_packages = tk.Radiobutton(choice_frame, text="Update Packages", variable=choice_var, value='4')
-choice_update_packages.grid(row=4, column=0, sticky=tk.W)
+    def update_packages(package_list):
+        packages = package_list.split(',')
+        for package in packages:
+            package = package.strip()
+            if package:
+                update_package(package)
 
-choice_exit = tk.Radiobutton(choice_frame, text="Exit", variable=choice_var, value='0')
-choice_exit.grid(row=5, column=0, sticky=tk.W)
+    window = tk.Tk()
+    window.title("Package Installer")
 
-# Entry
-entry_frame = tk.Frame(main_frame)
-entry_frame.pack(pady=10)
+    # Create the radio button options
+    option_var = tk.StringVar()
+    option_var.set("single")
 
-entry_label = tk.Label(entry_frame, text="Enter package(s):")
-entry_label.grid(row=0, column=0, sticky=tk.W)
+    single_mode_radio = tk.Radiobutton(window, text="Single Mode", variable=option_var, value="single")
+    single_mode_radio.pack(anchor=tk.W)
 
-entry = tk.Entry(entry_frame, width=50)
-entry.grid(row=1, column=0)
+    multi_mode_radio = tk.Radiobutton(window, text="Multi Mode", variable=option_var, value="multi")
+    multi_mode_radio.pack(anchor=tk.W)
 
-# Button
-button_frame = tk.Frame(main_frame)
-button_frame.pack(pady=10)
+    update_mode_radio = tk.Radiobutton(window, text="Update Mode", variable=option_var, value="update")
+    update_mode_radio.pack(anchor=tk.W)
 
-button = tk.Button(button_frame, text="Execute", command=on_choice_selected, width=10, height=2, bd=0, bg="#4CAF50", fg="white", font=("Arial", 12, "bold"))
-button.pack()
+    # Create the package input entry
+    package_label = tk.Label(window, text="Package(s):")
+    package_label.pack(anchor=tk.W)
 
-# Console Output
-console_frame = tk.Frame(main_frame)
-console_frame.pack()
+    package_entry = tk.Entry(window, width=50)
+    package_entry.pack()
 
-console_output = tkst.ScrolledText(console_frame, width=70, height=20)
-console_output.pack()
+    # Create the version input entry
+    version_label = tk.Label(window, text="Version:")
+    version_label.pack(anchor=tk.W)
 
-def write_to_console_output(text):
-    console_output.insert(tk.END, text)
+    version_entry = tk.Entry(window, width=50)
+    version_entry.pack()
 
-# Redirect stdout and stderr to the console_output
-sys.stdout.write = write_to_console_output
-sys.stderr.write = write_to_console_output
+    # Create the command output text widget
+    command_output = scrolledtext.ScrolledText(window, height=10, width=50, state=tk.DISABLED)
+    command_output.pack()
 
-root.mainloop()
+    # Create the execute button
+    execute_button = tk.Button(window, text="Execute", command=execute_command)
+    execute_button.pack()
+
+    window.mainloop()
+
+
+if __name__ == '__main__':
+    main()
