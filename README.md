@@ -35,7 +35,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 For any questions or inquiries, feel free to reach out to the project maintainer, [LopeKinz](https://github.com/LopeKinz).
 
 ## Changelog
-
+```
 ### Version 1.3.0 (2023.05.23)
 
 - Added Uninstall Option
@@ -69,7 +69,7 @@ For any questions or inquiries, feel free to reach out to the project maintainer
 - Added package installation functionality
 - Implemented single and multi-mode installation options
 - Added view extensions and update packages options
-
+```
 # Documentation
 
 ## Package Installer
