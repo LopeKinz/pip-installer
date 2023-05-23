@@ -16,15 +16,11 @@ To get started with the pip-installer, follow these steps:
    git clone https://github.com/LopeKinz/pip-installer.git
    ```
 
-2. Install pip (if not already installed):
-   ```
-   # Instructions for installing pip can be found at: https://pip.pypa.io/en/stable/installing/
-   ```
-
-3. Run the pip-installer script:
+2. Run the pip-installer script:
    ```
    python pip-installer.py
    ```
+3. If PiP is not installed it will be Automaticly installed.
 
 4. Follow the on-screen prompts to install the desired Python packages.
 5. Wanna Try GUI Version? Download [HERE](https://github.com/LopeKinz/pip-installer/tree/dev)
