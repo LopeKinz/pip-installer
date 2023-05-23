@@ -278,7 +278,7 @@ def main():
                 install_pip()
 
             print("\n===================================")
-            print("           Package Installer       ")
+            print("           Pip Installer            ")
             print("===================================")
             print("1. Single Mode")
             print("2. Multi Mode")
