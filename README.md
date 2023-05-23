@@ -36,6 +36,10 @@ For any questions or inquiries, feel free to reach out to the project maintainer
 
 ## Changelog
 ```
+### Version 1.3.1 (2023.05.23)
+
+- Added "Create own Package" Mode
+
 ### Version 1.3.0 (2023.05.23)
 
 - Added Uninstall Option
@@ -131,6 +135,10 @@ In Update Packages mode, you can update all installed packages by running the co
 ## Uninstall Packages
 
 In Uninstall mode you, can easily uninstall any package by their name.
+
+## Create Own Package
+
+In Create Own Package mode, you can easily create own PiP packages!
 
 ## Statistics
 
