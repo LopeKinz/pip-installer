@@ -36,6 +36,10 @@ For any questions or inquiries, feel free to reach out to the project maintainer
 
 ## Changelog
 ```
+### Version 1.4.0 (2023.05.24)
+
+- Added "Install from text file" Mode
+
 ### Version 1.3.1 (2023.05.23)
 
 - Added "Create own Package" Mode
@@ -108,6 +112,7 @@ The Package Installer provides the following options:
 - Update Packages: Update pip and all installed packages.
 - Uninstall Package: Remove a specific package from the system.
 - Create Own Package: Create your own PiP Package.
+- Install From Text File
 
 ## Single Mode
 
@@ -140,6 +145,10 @@ In Uninstall mode you, can easily uninstall any package by their name.
 ## Create Own Package
 
 In Create Own Package mode, you can easily create own PiP packages!
+
+## Install From Text File
+
+In this mode you can easily install packages from text file! (Format : Module,Module)
 
 ## Statistics
 
