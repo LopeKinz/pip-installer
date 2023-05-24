@@ -431,9 +431,33 @@ def main():
                 # Create the package
                 create_package(author, name, version, requirements,
                                main_file_path)
+               elif choice == "7":
+                            start_time = time.time()
+                            errors = 0
+                            num_updated_installed = 0
 
-            elif choice == "0":
-                break
+                            print("Enter the path to the text file containing package names (or type 'q' to quit):")
+                            file_path = input()
+
+                            if file_path.lower() == "q":
+                                continue
+
+                            try:
+                                with open(file_path, "r") as file:
+                                    package_list = file.read()
+                                install_packages(package_list)
+                                num_updated_installed = len(package_list.split(","))
+                            except FileNotFoundError:
+                                print("File not found. Please check the path and try again.")
+                                errors += 1
+                            except Exception as e:
+                                print("An error occurred while installing packages from the file.")
+                                print(f"Error message: {str(e)}")
+                                errors += 1
+
+                            display_stats(start_time, errors, num_updated_installed)
+                        elif choice == "0":
+                            break
 
             else:
                 print("Invalid choice. Please try again.")
