@@ -301,6 +301,7 @@ def main():
             print("4. Update Packages")
             print("5. Uninstall Package")
             print("6. Create Own Package")
+            print("7. Install from Textfile")
             print("0. Exit")
             print("-----------------------------------")
             print("Author: LopeKinz")
